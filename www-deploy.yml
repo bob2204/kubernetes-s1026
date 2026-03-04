@@ -15,11 +15,11 @@ spec:
         app: www
     spec:
       containers:
-      - image: nginx:1.28
-        name: nginx
+      - image: nginx:1.26
+        name: nginx-testa
         ports:
-          - name: http
-            containerPort: 80
+        - name: http
+          containerPort: 80
         env:
           - name: STAGE
             value: K8S
@@ -39,19 +39,32 @@ spec:
                 key: PASSWORD
 
         envFrom:
-          - configMapRef:
-              name: www
-
+        - configMapRef:
+            name: www
         readinessProbe:
           httpGet:
             path: /index.html
             port: 80
           periodSeconds: 3
           failureThreshold: 2
-
         livenessProbe:
           httpGet:
             path: /index.html
             port: 80
           periodSeconds: 10
           failureThreshold: 2
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+
+      volumes:
+      - name: html
+        hostPath:
+          path: /home/stagiaire/data/html
+          type: Directory
+      - name: nginx-conf
+        hostPath:
+          path: /home/stagiaire/data/nginx-conf
+          type: Directory
