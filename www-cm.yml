@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: www
+data:
+  JOURS: "5"
+  STAGIAIRES: "3"
+  NIVEAU: "I+A"
