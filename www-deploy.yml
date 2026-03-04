@@ -69,6 +69,6 @@ spec:
 
       volumes:
       - name: data
-        hostPath:
-          path: /home/stagiaire/data
-          type: Directory
+        nfs:
+          path: /
+          server: 192.168.56.200
