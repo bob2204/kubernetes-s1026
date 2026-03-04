@@ -17,3 +17,14 @@ spec:
       containers:
       - image: bob2606/hello-http:0.9.5-3
         name: hello-http
+        envFrom:
+          - configMapRef:
+              name: hello
+        env:
+          - name: NODENAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        ports:
+          - containerPort: 80
+            name: http
