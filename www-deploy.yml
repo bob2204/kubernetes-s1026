@@ -54,17 +54,21 @@ spec:
           periodSeconds: 10
           failureThreshold: 2
         volumeMounts:
-        - name: html
+        - name: data
           mountPath: /usr/share/nginx/html
-        - name: nginx-conf
+          subPath: html
+        - name: data
           mountPath: /etc/nginx/conf.d
+          subPath: nginx-conf
+      - image: php:8.4-fpm
+        name: php
+        volumeMounts:
+        - name: data
+          mountPath: /var/www/html
+          subPath: html
 
       volumes:
-      - name: html
+      - name: data
         hostPath:
-          path: /home/stagiaire/data/html
-          type: Directory
-      - name: nginx-conf
-        hostPath:
-          path: /home/stagiaire/data/nginx-conf
+          path: /home/stagiaire/data
           type: Directory
