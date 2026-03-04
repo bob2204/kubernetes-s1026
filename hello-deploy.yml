@@ -5,7 +5,11 @@ metadata:
     app: hello
   name: hello
 spec:
-  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0 
+  replicas: 10
   selector:
     matchLabels:
       app: hello
@@ -25,6 +29,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
+          - name: ENV
+            value: "2"
         ports:
           - containerPort: 80
             name: http
