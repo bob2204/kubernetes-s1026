@@ -32,6 +32,11 @@ spec:
               configMapKeyRef:
                 name: www
                 key: JOURS
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: www
+                key: PASSWORD
 
         envFrom:
           - configMapRef:
