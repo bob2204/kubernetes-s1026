@@ -5,7 +5,7 @@ metadata:
     app: hello
   name: hello
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: hello
@@ -15,7 +15,7 @@ spec:
         app: hello
     spec:
       containers:
-      - image: bob2606/hello-http:0.9.5-3
+      - image: bob2606/hello-http:0.8.39
         name: hello-http
         envFrom:
           - configMapRef:
@@ -28,3 +28,15 @@ spec:
         ports:
           - containerPort: 80
             name: http
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 80
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          periodSeconds: 1
+          failureThreshold: 5
