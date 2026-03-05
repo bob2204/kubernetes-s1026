@@ -9,7 +9,7 @@ spec:
     rollingUpdate:
       maxSurge: 100%
       maxUnavailable: 0 
-  replicas: 10
+  replicas: 1
   selector:
     matchLabels:
       app: hello
@@ -46,3 +46,10 @@ spec:
             port: 80
           periodSeconds: 1
           failureThreshold: 5
+        volumeMounts:
+          - name: status
+            mountPath: /var/lib/hello-http
+      volumes:
+        - name: status
+          configMap:
+            name: hello-status

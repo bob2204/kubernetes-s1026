@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  status.txt: |
+    Micro-TP n°9
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: hello-status
