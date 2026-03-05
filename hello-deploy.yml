@@ -18,22 +18,32 @@ spec:
       labels:
         app: hello
     spec:
+      initContainers:
+      - image: busybox:1.28
+        name: mkstatus
+        volumeMounts:
+        - name: status
+          mountPath: /mnt
+        command:
+        - sh
+        - -c
+        - hostname > /mnt/status
       containers:
       - image: bob2606/hello-http:0.8.39
         name: hello-http
         envFrom:
-          - configMapRef:
-              name: hello
+        - configMapRef:
+            name: hello
         env:
-          - name: NODENAME
-            valueFrom:
-              fieldRef:
-                fieldPath: spec.nodeName
-          - name: ENV
-            value: "2"
+        - name: NODENAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: ENV
+          value: "2"
         ports:
-          - containerPort: 80
-            name: http
+        - containerPort: 80
+          name: http
         livenessProbe:
           httpGet:
             path: /livez
@@ -47,9 +57,8 @@ spec:
           periodSeconds: 1
           failureThreshold: 5
         volumeMounts:
-          - name: status
-            mountPath: /var/lib/hello-http
-      volumes:
         - name: status
-          configMap:
-            name: hello-status
+          mountPath: /var/lib/hello-http
+      volumes:
+      - name: status
+        emptyDir:
