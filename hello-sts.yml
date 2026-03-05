@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: hello
+  name: hello
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      initContainers:
+      - image: busybox:1.28
+        name: mkstatus
+        volumeMounts:
+        - name: status
+          mountPath: /mnt
+        command:
+        - sh
+        - -c
+        - |
+          idx=$(hostname|cut -d- -f2)
+          if [ $idx = 0 ]
+          then
+            echo "Primaire" > /mnt/status
+          else
+            echo "Secondaire n°$idx" > /mnt/status
+          fi
+      containers:
+      - image: bob2606/hello-http:0.8.39
+        name: hello-http
+        envFrom:
+        - configMapRef:
+            name: hello
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: status
+          mountPath: /var/lib/hello-http
+        startupProbe:
+          httpGet:
+            path: /status
+            port: 80
+          initialDelaySeconds: 5
+      volumes:
+      - name: status
+        emptyDir:
