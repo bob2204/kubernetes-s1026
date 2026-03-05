@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  serviceName: redis
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      initContainers:
+        - name: init-redis
+          image: busybox:1.28
+          command:
+            - sh
+            - "-c"
+            - |
+              [ -f /mnt/conf/redis.conf ] && exit 0
+              ordinal=$(hostname | cut -d- -f2)
+              echo $ordinal
+              cp /mnt/config-map/redis.conf /mnt/conf/redis.conf
+              if [[ ${ordinal} -eq 0 ]]
+              then
+                cat /mnt/config-map/master.conf >> /mnt/conf/redis.conf
+              else
+                cat /mnt/config-map/slave.conf >> /mnt/conf/redis.conf
+              fi
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+            - name: redis-conf
+              mountPath: /mnt/conf
+            - name: config-map
+              mountPath: /mnt/config-map
+      containers:
+        - name: redis
+          image: redis:7
+          command:
+            - redis-server
+            - /usr/local/etc/redis/redis.conf
+          ports:
+            - name: redis
+              containerPort: 6379
+          volumeMounts:
+            - name: redis-conf
+              mountPath: /usr/local/etc/redis
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: config-map
+          configMap:
+            name: redis-cm
+        - name: redis-conf
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 1Gi
