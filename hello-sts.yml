@@ -5,6 +5,7 @@ metadata:
     app: hello
   name: hello
 spec:
+  serviceName: hello
   replicas: 3
   selector:
     matchLabels:
