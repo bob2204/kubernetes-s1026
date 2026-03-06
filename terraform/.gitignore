@@ -1,0 +1,4 @@
+init-env.sh
+.terraform*
+terraform*
+setup.sh
